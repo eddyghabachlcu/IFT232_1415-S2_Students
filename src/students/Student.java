@@ -3,21 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package students;
+
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Prof
  */
+import java.sql.*;
+
 public class Student extends javax.swing.JDialog {
 
-    /**
-     * Creates new form Student
-     */
-    public Student(java.awt.Frame parent, boolean modal) {
+    private Connection con;
+    
+    public Student(java.awt.Frame parent, boolean modal, Connection con) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Student");
+        this.setLocationRelativeTo(this);
+        this.con = con;
     }
 
     /**
@@ -58,6 +63,7 @@ public class Student extends javax.swing.JDialog {
         jLabel3.setText("Gender");
 
         buttonGroup1.add(rbMale);
+        rbMale.setSelected(true);
         rbMale.setText("Male");
 
         buttonGroup1.add(rbFemale);
@@ -73,13 +79,28 @@ public class Student extends javax.swing.JDialog {
 
         jLabel7.setText("Address");
 
+        chkLebanese.setSelected(true);
         chkLebanese.setText("Lebanese");
+
+        txtAge.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtAgeKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtAgeKeyTyped(evt);
+            }
+        });
 
         txtAddress.setColumns(20);
         txtAddress.setRows(5);
         jScrollPane1.setViewportView(txtAddress);
 
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -163,6 +184,67 @@ public class Student extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtAgeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAgeKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAgeKeyPressed
+
+    private void txtAgeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAgeKeyTyped
+        if (!Character.isDigit(evt.getKeyChar())
+                || txtAge.getText().length() > 1) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtAgeKeyTyped
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        if (txtFirstName.getText().equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Enter a First Name", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (txtLastName.getText().equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Enter a Last Name", "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+        } else {
+            String firstName = txtFirstName.getText();
+            String lastName = txtLastName.getText();
+            String gender;
+            if (rbMale.isSelected()) {
+                gender = "Male";
+            } else {
+                gender = "Female";
+            }
+            int academicYear = 
+                    Integer.parseInt(
+                            cbxAcademicYear.
+                                    getSelectedItem().toString());
+            String lebanese;
+            if(chkLebanese.isSelected()){
+                lebanese="Yes";
+            }else{
+                lebanese="No";
+            }
+            int age = Integer.parseInt(txtAge.getText());
+            String email = txtEmail.getText();
+            String address = txtAddress.getText();
+            try {
+                PreparedStatement pstmt = 
+                        con.prepareStatement("Insert Into "
+                                + "tbl_students (std_firstName,"
+                                + "std_lastName, std_gender, "
+                                + "std_academicYear, std_lebanese, "
+                                + "std_age, std_email, std_address) "
+                                + "Values ( '"+ firstName +"', "
+                                + "'"+ lastName +"', '"+ gender +"', "
+                                + academicYear +", '"+ lebanese +"', "
+                                + age +", '" + email +"', '"+ address + "')");
+                pstmt.execute();
+                this.dispose();
+            } catch (SQLException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnSaveActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -193,7 +275,7 @@ public class Student extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Student dialog = new Student(new javax.swing.JFrame(), true);
+                Student dialog = new Student(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

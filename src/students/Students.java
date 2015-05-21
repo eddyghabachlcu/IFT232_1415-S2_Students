@@ -171,8 +171,9 @@ public class Students extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        Student newStudent = new Student(this, true);
+        Student newStudent = new Student(this, true, con);
         newStudent.setVisible(true);
+        refreshTable();
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void refreshTable() {
