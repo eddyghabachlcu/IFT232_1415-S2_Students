@@ -103,6 +103,11 @@ public class Students extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tblStudents);
 
         btnAdd.setText("Add");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
 
         btnModify.setText("Modify");
 
@@ -164,6 +169,11 @@ public class Students extends javax.swing.JFrame {
                     "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        Student newStudent = new Student(this, true);
+        newStudent.setVisible(true);
+    }//GEN-LAST:event_btnAddActionPerformed
 
     private void refreshTable() {
         studentsPUEntityManager.getTransaction().begin();
