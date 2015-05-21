@@ -150,19 +150,35 @@ public class Students extends javax.swing.JFrame {
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         int selectedRow = tblStudents.getSelectedRow();
-        if(selectedRow>-1){
+        if (selectedRow > -1) {
             int stdid = Integer.parseInt(tblStudents.getValueAt(selectedRow, 0).toString());
-            try{
+            try {
                 Statement stmt = con.createStatement();
                 stmt.execute("Delete From tbl_students Where std_id =" + stdid);
-            }catch(SQLException ex){
+                refreshTable();
+            } catch (SQLException ex) {
                 System.err.println(ex.getMessage());
             }
-        }else{
-            JOptionPane.showMessageDialog(this, "Select a record to delete", 
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a record to delete",
                     "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void refreshTable() {
+        studentsPUEntityManager.getTransaction().begin();
+        java.util.Collection data = tblStudentsQuery.getResultList();
+        for (Object entity : data) {
+            studentsPUEntityManager.refresh(entity);
+        }
+        tblStudentsList.clear();
+        tblStudentsList.addAll(data);
+        studentsPUEntityManager.getTransaction().commit();
+        bindingGroup.unbind();
+        bindingGroup.bind();
+        tblStudents.getColumnModel().getColumn(0).setMinWidth(0);
+        tblStudents.getColumnModel().getColumn(0).setMaxWidth(0);
+    }
 
     /**
      * @param args the command line arguments
