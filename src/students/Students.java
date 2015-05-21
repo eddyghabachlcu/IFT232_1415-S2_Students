@@ -110,6 +110,11 @@ public class Students extends javax.swing.JFrame {
         });
 
         btnModify.setText("Modify");
+        btnModify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModifyActionPerformed(evt);
+            }
+        });
 
         btnDelete.setText("Delete");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -171,10 +176,23 @@ public class Students extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        Student newStudent = new Student(this, true, con);
+        Student newStudent = new Student(this, true, con, 0);
         newStudent.setVisible(true);
         refreshTable();
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModifyActionPerformed
+        int selectedRow = tblStudents.getSelectedRow();
+        if (selectedRow > -1) {
+            int stdid = Integer.parseInt(tblStudents.getValueAt(selectedRow, 0).toString());
+            Student newStudent = new Student(this, true, con, stdid);
+            newStudent.setVisible(true);
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a record to modify",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnModifyActionPerformed
 
     private void refreshTable() {
         studentsPUEntityManager.getTransaction().begin();

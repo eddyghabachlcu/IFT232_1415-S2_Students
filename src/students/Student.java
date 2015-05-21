@@ -16,13 +16,45 @@ import java.sql.*;
 public class Student extends javax.swing.JDialog {
 
     private Connection con;
-    
-    public Student(java.awt.Frame parent, boolean modal, Connection con) {
+    private int stdid;
+
+    public Student(java.awt.Frame parent, boolean modal, Connection con, int stdid) {
         super(parent, modal);
         initComponents();
         this.setTitle("Student");
         this.setLocationRelativeTo(this);
         this.con = con;
+        this.stdid = stdid;
+        populate();
+    }
+
+    private void populate() {
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs
+                    = stmt.executeQuery("Select * "
+                            + "From tbl_students Where std_id =" + stdid);
+            if (rs.next()) {
+                txtFirstName.setText(rs.getString("std_firstName"));
+                txtLastName.setText(rs.getString("std_lastName"));
+                if(rs.getString("std_gender").equals("Male")){
+                    rbMale.setSelected(true);
+                }else{
+                    rbFemale.setSelected(true);
+                }
+                cbxAcademicYear.setSelectedItem(rs.getString("std_academicYear"));
+                if(rs.getString("std_lebanese").equals("Yes")){
+                    chkLebanese.setSelected(true);
+                }else{
+                    chkLebanese.setSelected(false);
+                }
+                txtAge.setText(rs.getString("std_age"));
+                txtEmail.setText(rs.getString("std_email"));
+                txtAddress.setText(rs.getString("std_address"));
+            }
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+        }
     }
 
     /**
@@ -213,30 +245,43 @@ public class Student extends javax.swing.JDialog {
             } else {
                 gender = "Female";
             }
-            int academicYear = 
-                    Integer.parseInt(
+            int academicYear
+                    = Integer.parseInt(
                             cbxAcademicYear.
-                                    getSelectedItem().toString());
+                            getSelectedItem().toString());
             String lebanese;
-            if(chkLebanese.isSelected()){
-                lebanese="Yes";
-            }else{
-                lebanese="No";
+            if (chkLebanese.isSelected()) {
+                lebanese = "Yes";
+            } else {
+                lebanese = "No";
             }
             int age = Integer.parseInt(txtAge.getText());
             String email = txtEmail.getText();
             String address = txtAddress.getText();
             try {
-                PreparedStatement pstmt = 
-                        con.prepareStatement("Insert Into "
+                PreparedStatement pstmt;
+                if(stdid==0){
+                       pstmt = con.prepareStatement("Insert Into "
                                 + "tbl_students (std_firstName,"
                                 + "std_lastName, std_gender, "
                                 + "std_academicYear, std_lebanese, "
                                 + "std_age, std_email, std_address) "
-                                + "Values ( '"+ firstName +"', "
-                                + "'"+ lastName +"', '"+ gender +"', "
-                                + academicYear +", '"+ lebanese +"', "
-                                + age +", '" + email +"', '"+ address + "')");
+                                + "Values ( '" + firstName + "', "
+                                + "'" + lastName + "', '" + gender + "', "
+                                + academicYear + ", '" + lebanese + "', "
+                                + age + ", '" + email + "', '" + address + "')");
+                }else{
+                    pstmt = con.prepareStatement("Update tbl_students "
+                            + "Set std_firstName = '" + firstName + "', "
+                            + "std_lastName = '" + lastName + "', "
+                            + "std_gender = '" + gender + "', "
+                            + "std_academicYear = " + academicYear + ", "
+                            + "std_lebanese = '" + lebanese + "', "
+                            + "std_age = " + age + "," 
+                            + "std_email = '" + email + "',"
+                            + "std_address = '" + address + "' "
+                            + "Where std_id = " + stdid);
+                }
                 pstmt.execute();
                 this.dispose();
             } catch (SQLException ex) {
@@ -275,7 +320,7 @@ public class Student extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Student dialog = new Student(new javax.swing.JFrame(), true, null);
+                Student dialog = new Student(new javax.swing.JFrame(), true, null, 0);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
